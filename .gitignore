@@ -1,0 +1,17 @@
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Local build symlinks / scratch artifacts
+.build
+.build *
+/.build*
+
+# Exported design spec snapshots and archives (not source)
+/CoLeaner.html
+/CoLeaner_files/
+/CoLeaner.zip
+/CoLeaner_1.zip
+CoLeaner_*.zip
