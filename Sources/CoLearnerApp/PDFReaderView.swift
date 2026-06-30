@@ -22,7 +22,10 @@ struct PDFReaderView: NSViewRepresentable {
     func makeNSView(context: Context) -> PDFView {
         let pdfView = PDFView()
         pdfView.autoScales = true
-        pdfView.backgroundColor = .clHex(0xECE5D6)
+                pdfView.backgroundColor = NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            return NSColor.clHex(isDark ? 0x0E0C0A : 0xECE5D6)
+        }
         pdfView.displayDirection = .vertical
         pdfView.displayMode = .singlePageContinuous
         pdfView.displaysPageBreaks = true
@@ -104,8 +107,12 @@ struct PDFReaderView: NSViewRepresentable {
         weak var pdfView: PDFView?
         var lastNavigationTargetID: UUID?
         var lastSearchNavigationTargetID: UUID?
-        var lastHighlightRequestID: UUID?
+                var lastHighlightRequestID: UUID?
         var lastUserHighlightRequestID: UUID?
+        /// When true, selection-change notifications triggered by our own programmatic
+        /// `setCurrentSelection`/restore calls are ignored so they don't clobber the
+        /// learner's real selection or flip the chat context scope.
+        var isProgrammaticSelectionChange = false
 
         init(
             onSelectionChange: @escaping (String) -> Void,
@@ -115,7 +122,9 @@ struct PDFReaderView: NSViewRepresentable {
             self.onPageChange = onPageChange
         }
 
-        @objc func selectionChanged(_ notification: Notification) {
+                @objc func selectionChanged(_ notification: Notification) {
+            guard !isProgrammaticSelectionChange else { return }
+
             let selectedText = pdfView?
                 .currentSelection?
                 .string?
@@ -150,6 +159,10 @@ struct PDFReaderView: NSViewRepresentable {
                 return
             }
 
+                        let preservedSelection = pdfView.currentSelection
+            isProgrammaticSelectionChange = true
+            defer { isProgrammaticSelectionChange = false }
+
             for snippet in snippets {
                 let matches = matches(for: snippet, in: document)
                 for match in matches.prefix(4) {
@@ -157,8 +170,9 @@ struct PDFReaderView: NSViewRepresentable {
                 }
             }
 
-            pdfView.clearSelection()
-            pdfView.currentSelection = nil
+            // Restore the learner's text selection instead of clearing it — applying AI
+            // highlights should not destroy an active selection the learner is working with.
+            pdfView.currentSelection = preservedSelection
             pdfView.needsDisplay = true
             pdfView.documentView?.needsDisplay = true
             pdfView.layoutDocumentView()
@@ -200,6 +214,8 @@ struct PDFReaderView: NSViewRepresentable {
                 return
             }
 
+                        isProgrammaticSelectionChange = true
+            defer { isProgrammaticSelectionChange = false }
             pdfView.setCurrentSelection(selection, animate: true)
             pdfView.scrollSelectionToVisible(nil)
         }

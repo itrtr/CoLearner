@@ -24,6 +24,14 @@ struct CoLearnerApp: App {
                 .keyboardShortcut("o", modifiers: [.command])
             }
 
+            CommandMenu("Find") {
+                Button("Find in Document") {
+                    viewModel.focusSearchField()
+                }
+                .keyboardShortcut("f", modifiers: [.command])
+                .disabled(!viewModel.hasDocument)
+            }
+
             CommandMenu("Assistant") {
                 ForEach(StudyMode.allCases) { mode in
                     Button(mode.label) {

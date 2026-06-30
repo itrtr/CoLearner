@@ -4,6 +4,9 @@ DerivedData/
 *.xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 
+# Local Claude Code permission settings
+.claude/
+
 # Local build symlinks / scratch artifacts
 .build
 .build *

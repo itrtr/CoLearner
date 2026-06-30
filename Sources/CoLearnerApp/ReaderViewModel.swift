@@ -33,6 +33,7 @@ final class ReaderViewModel: ObservableObject {
     @Published var chatDraft = ""
     @Published var draftNote = ""
     @Published var documentSearchQuery = ""
+    @Published var searchFieldFocusToken = 0
     @Published var selectedUserHighlightColor: UserHighlightColor = .yellow
     @Published private(set) var chatMessages = [ChatMessage]()
     @Published private(set) var savedNotes = [LearningNote]()
@@ -52,6 +53,7 @@ final class ReaderViewModel: ObservableObject {
 
     private let claudeModelDefaultsKey = "selectedClaudeModelID"
     private let codexModelDefaultsKey = "selectedCodexModelID"
+    private static let lastDocumentDefaultsKey = "lastOpenedDocumentPath"
 
     init(
         sessionManager: OAuthSessionManager? = nil,
@@ -94,6 +96,8 @@ final class ReaderViewModel: ObservableObject {
         Task { [weak self] in
             await self?.refreshSignedInState()
         }
+
+        reopenLastDocumentIfAvailable()
     }
 
     func selectClaudeModel(_ id: String) {
@@ -239,9 +243,9 @@ final class ReaderViewModel: ObservableObject {
         case .local:
             "Fast offline helper. Good for instant summaries, examples, quizzes, and highlight suggestions."
         case .codex:
-            "Uses your local Codex CLI login. Good for deeper reasoning over the selected PDF context."
+            "Directly calls the ChatGPT API using your subscription sign-in. Good for deeper reasoning over the active PDF context."
         case .claude:
-            "Uses your local Claude Code login. Good for explanatory, tutor-style responses."
+            "Directly calls the Anthropic API using your Claude subscription sign-in. Good for explanatory, tutor-style responses."
         case .openCode:
             "Uses your OpenCode setup. Good when OpenCode has your preferred model/account."
         case .pi:
@@ -324,6 +328,7 @@ final class ReaderViewModel: ObservableObject {
         chatTask?.cancel()
         document = loadedDocument
         documentURL = url
+        UserDefaults.standard.set(url.path, forKey: Self.lastDocumentDefaultsKey)
         selectedSelection = nil
         response = nil
         isResponding = false
@@ -484,6 +489,21 @@ final class ReaderViewModel: ObservableObject {
         searchNavigationTarget = nil
     }
 
+    /// Bump a token the sidebar observes to programmatically focus the search field (⌘F).
+    func focusSearchField() {
+        searchFieldFocusToken += 1
+    }
+
+    /// Reopen the document that was open when the app last quit, if it still exists.
+    func reopenLastDocumentIfAvailable() {
+        guard let path = UserDefaults.standard.string(forKey: Self.lastDocumentDefaultsKey),
+              !path.isEmpty,
+              FileManager.default.fileExists(atPath: path) else {
+            return
+        }
+        openPDF(at: URL(fileURLWithPath: path))
+    }
+
     func navigateToSearchResult(_ result: DocumentSearchResult) {
         selectedSearchResultID = result.id
         currentPageIndex = result.pageIndex
@@ -582,6 +602,9 @@ final class ReaderViewModel: ObservableObject {
         response = nil
         errorMessage = nil
         chatDraft = ""
+        showsAIHighlights = false
+        availableAIHighlights = []
+        highlightRequest = PDFHighlightRequest(snippets: [])
         chatMessages = hasDocument ? [
             ChatMessage(
                 role: .assistant,
@@ -690,7 +713,8 @@ final class ReaderViewModel: ObservableObject {
         let agent = makeAgent(for: provider)
         let selection = ReadingSelection(text: context.text, sourceTitle: context.title)
 
-        chatTask = Task { [agent] in
+        chatTask = Task { [weak self, agent] in
+            guard let self else { return }
             var hasStartedStreaming = false
             var finalResponse: StudyResponse?
 

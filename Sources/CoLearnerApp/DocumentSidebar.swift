@@ -4,6 +4,7 @@ struct DocumentSidebar: View {
     @ObservedObject var viewModel: ReaderViewModel
     var onOpenCompanion: () -> Void = {}
     @Environment(\.clInterfaceScale) private var interfaceScale
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,6 +24,9 @@ struct DocumentSidebar: View {
             DisplaySettingsPanel()
         }
         .background(CLColor.window)
+        .onChange(of: viewModel.searchFieldFocusToken) { _, _ in
+            isSearchFocused = true
+        }
     }
 
     private var header: some View {
@@ -53,6 +57,7 @@ struct DocumentSidebar: View {
                 .textFieldStyle(.plain)
                 .font(.system(size: 12 * interfaceScale))
                 .foregroundStyle(CLColor.ink)
+                .focused($isSearchFocused)
                 .onSubmit {
                     viewModel.searchDocument()
                 }
