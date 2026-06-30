@@ -6,6 +6,7 @@ struct ReaderPane: View {
     let isDropTargeted: Bool
     let onRequestCompanion: () -> Void
     @State private var pageEntry = ""
+    @State private var selectionPulse = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,9 +41,20 @@ struct ReaderPane: View {
                 if viewModel.readingMode == .selfStudy,
                    viewModel.selectedSelection != nil {
                     selfModeSelectionPrompt
+                        .transition(
+                            .asymmetric(
+                                insertion: .move(edge: .trailing)
+                                    .combined(with: .opacity)
+                                    .combined(with: .scale(scale: 0.9, anchor: .bottomTrailing)),
+                                removal: .opacity
+                                    .combined(with: .move(edge: .trailing))
+                                    .combined(with: .scale(scale: 0.92, anchor: .bottomTrailing))
+                            )
+                        )
                 }
             }
             .background(CLColor.desk)
+            .animation(.spring(response: 0.42, dampingFraction: 0.78), value: viewModel.selectedSelection != nil)
         }
         .background(CLColor.desk)
         .onAppear {
@@ -260,8 +272,24 @@ struct ReaderPane: View {
     private var selfModeSelectionPrompt: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 7) {
-                Image(systemName: "text.viewfinder")
-                    .foregroundStyle(CLColor.accent)
+                ZStack {
+                    // Pulsing halo behind the selection marker.
+                    Circle()
+                        .fill(CLColor.accent.opacity(0.35))
+                        .frame(width: 18, height: 18)
+                        .scaleEffect(selectionPulse ? 1.35 : 0.85)
+                        .opacity(selectionPulse ? 0 : 0.8)
+                        .animation(
+                            .easeOut(duration: 1.4).repeatForever(autoreverses: false),
+                            value: selectionPulse
+                        )
+                    Image(systemName: "text.viewfinder")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(CLColor.accent)
+                        .frame(width: 16, height: 16)
+                }
+                .frame(width: 18, height: 18)
+
                 Text("Selection ready")
                     .font(.system(size: 12.5, weight: .semibold))
                     .foregroundStyle(CLColor.ink)
@@ -298,6 +326,7 @@ struct ReaderPane: View {
         .shadow(color: .black.opacity(0.08), radius: 12, y: 5)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         .padding(18)
+        .onAppear { selectionPulse = true }
     }
 
     private var emptyState: some View {
@@ -344,3 +373,4 @@ struct ReaderPane: View {
         .background(CLColor.desk)
     }
 }
+
