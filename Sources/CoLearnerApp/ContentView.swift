@@ -22,13 +22,11 @@ struct ContentView: View {
                 isRightPaneVisible: isRightPaneVisible,
                 readingMode: viewModel.readingMode,
                 themeMode: themeMode,
-                onToggleLeftPane: { isLeftPaneVisible.toggle() },
+                onToggleLeftPane: { withAnimation(.easeInOut(duration: 0.2)) { isLeftPaneVisible.toggle() } },
                 onToggleRightPane: toggleRightPane,
                 onSelectReadingMode: selectReadingMode(_:),
                 onToggleTheme: toggleTheme
             )
-
-            CLDivider(.horizontal)
 
             HSplitView {
                 if viewModel.hasDocument, isLeftPaneVisible {
@@ -60,9 +58,12 @@ struct ContentView: View {
                             maxWidth: CLMetric.rightPaneMaxWidth,
                             maxHeight: .infinity
                         )
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .animation(.easeInOut(duration: 0.2), value: isRightPaneVisible)
+            .animation(.easeInOut(duration: 0.2), value: viewModel.readingMode)
         }
         .background(CLColor.desk)
         .environment(\.clInterfaceScale, CGFloat(interfaceScale))
@@ -158,46 +159,22 @@ private struct AppTitleBar: View {
     @Environment(\.clInterfaceScale) private var interfaceScale
 
     var body: some View {
-        ZStack {
-            HStack(spacing: 0) {
-                HStack(spacing: 10) {
-                    CLToolbarIconButton(
-                        systemImage: "sidebar.left",
-                        title: "Toggle outline",
-                        isActive: isLeftPaneVisible,
-                        isDisabled: !hasDocument,
-                        action: onToggleLeftPane
-                    )
-                }
-                .frame(width: 110 * interfaceScale, alignment: .leading)
-
-                Spacer()
-
-                if hasDocument {
-                    readerModePicker
-                        .padding(.trailing, 12)
-                }
-
-                HStack(spacing: 8) {
-                    CLToolbarIconButton(
-                        systemImage: themeMode.iconName,
-                        title: "Theme: \(themeMode.label)",
-                        isActive: themeMode != .system,
-                        action: onToggleTheme
-                    )
-                    CLToolbarIconButton(
-                        systemImage: "sidebar.right",
-                        title: "Toggle AI companion",
-                        isActive: isRightPaneVisible && readingMode == .companion,
-                        isDisabled: !hasDocument,
-                        action: onToggleRightPane
-                    )
-                }
-                .frame(width: 120 * interfaceScale, alignment: .trailing)
+        HStack(spacing: 0) {
+            // Left cluster
+            HStack(spacing: 6) {
+                CLToolbarIconButton(
+                    systemImage: "sidebar.left",
+                    title: "Toggle outline",
+                    isActive: isLeftPaneVisible,
+                    isDisabled: !hasDocument,
+                    action: onToggleLeftPane
+                )
             }
-            .padding(.leading, 10)
-            .padding(.trailing, 10)
+            .frame(width: 130 * interfaceScale, alignment: .leading)
 
+            Spacer()
+
+            // Center: title + meta
             HStack(spacing: 8) {
                 Text(title)
                     .font(.system(size: 13 * interfaceScale, weight: .semibold))
@@ -205,15 +182,44 @@ private struct AppTitleBar: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
 
-                Text(meta)
-                    .font(.system(size: 11 * interfaceScale, design: .monospaced))
-                    .foregroundStyle(CLColor.ink3)
-                    .lineLimit(1)
+                if !meta.isEmpty {
+                    Text(meta)
+                        .font(.system(size: 11 * interfaceScale, design: .monospaced))
+                        .foregroundStyle(CLColor.ink3)
+                        .lineLimit(1)
+                }
             }
-            .padding(.horizontal, 210 * interfaceScale)
+            .frame(maxWidth: .infinity)
+
+            Spacer()
+
+            // Right cluster
+            HStack(spacing: 6) {
+                if hasDocument {
+                    readerModePicker
+                }
+                CLToolbarIconButton(
+                    systemImage: themeMode.iconName,
+                    title: "Theme: \(themeMode.label)",
+                    isActive: themeMode != .system,
+                    action: onToggleTheme
+                )
+                CLToolbarIconButton(
+                    systemImage: "sidebar.right",
+                    title: "Toggle AI companion",
+                    isActive: isRightPaneVisible && readingMode == .companion,
+                    isDisabled: !hasDocument,
+                    action: onToggleRightPane
+                )
+            }
+            .frame(width: 130 * interfaceScale, alignment: .trailing)
         }
+        .padding(.horizontal, 14)
         .frame(height: CLMetric.titleBarHeight * interfaceScale)
-        .background(CLColor.window)
+        .clMaterialBar()
+        .overlay(alignment: .bottom) {
+            CLDivider(.horizontal)
+        }
     }
 
     private var readerModePicker: some View {
@@ -231,6 +237,6 @@ private struct AppTitleBar: View {
         }
         .pickerStyle(.segmented)
         .labelsHidden()
-        .frame(width: 180 * interfaceScale)
+        .frame(width: 170 * interfaceScale)
     }
 }

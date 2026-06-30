@@ -24,7 +24,7 @@ struct PDFReaderView: NSViewRepresentable {
         pdfView.autoScales = true
                 pdfView.backgroundColor = NSColor(name: nil) { appearance in
             let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            return NSColor.clHex(isDark ? 0x0E0C0A : 0xECE5D6)
+            return NSColor.clHex(isDark ? 0x000000 : 0xEDEAE3)
         }
         pdfView.displayDirection = .vertical
         pdfView.displayMode = .singlePageContinuous

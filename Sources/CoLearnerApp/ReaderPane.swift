@@ -27,7 +27,7 @@ struct ReaderPane: View {
                         onSelectionChange: viewModel.updateSelection(text:),
                         onPageChange: viewModel.updateCurrentPage(index:)
                     )
-                    .background(CLColor.desk)
+                    .background(CLColor.paper)
                 } else {
                     emptyState
                 }
@@ -53,10 +53,10 @@ struct ReaderPane: View {
                         )
                 }
             }
-            .background(CLColor.desk)
+            .background(CLColor.paper)
             .animation(.spring(response: 0.42, dampingFraction: 0.78), value: viewModel.selectedSelection != nil)
         }
-        .background(CLColor.desk)
+        .background(CLColor.paper)
         .onAppear {
             syncPageEntry()
         }
@@ -370,7 +370,7 @@ struct ReaderPane: View {
             .buttonStyle(CLPrimaryButtonStyle())
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(CLColor.desk)
+        .background(CLColor.paper)
     }
 }
 

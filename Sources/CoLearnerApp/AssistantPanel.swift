@@ -38,7 +38,7 @@ struct AssistantPanel: View {
                 composer
             }
         }
-        .background(CLColor.window)
+        .background(CLColor.chrome)
     }
 
     private var header: some View {

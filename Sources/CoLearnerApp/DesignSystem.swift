@@ -1,93 +1,121 @@
 import AppKit
 import SwiftUI
 
+// MARK: - Color palette
+
+/// A refined, modern palette that keeps CoLearner's warm reading-room character
+/// but with cleaner neutrals, crisper contrast, and better dark-mode separation.
+/// Chrome (toolbars/sidebars) uses cool grays; paper surfaces stay warm.
 enum CLColor {
-    static let desk = Color.clDynamic(light: 0xECE5D6, dark: 0x0E0C0A)
-    static let window = Color.clDynamic(light: 0xFBF7F0, dark: 0x1B1815)
-    static let paper = Color.clDynamic(light: 0xFBF7F0, dark: 0x1D1916)
-    static let surface = Color.clDynamic(light: 0xFFFFFF, dark: 0x1F1C19)
-    static let ink = Color.clDynamic(light: 0x1C1816, dark: 0xEFE6D6)
-    static let ink2 = Color.clDynamic(light: 0x4B4239, dark: 0xC9BDAB)
-    static let ink3 = Color.clDynamic(light: 0x7A7066, dark: 0x8B8174)
-    static let ink4 = Color.clDynamic(light: 0xA89E90, dark: 0x5E5649)
-    static let border = Color.clDynamic(light: 0xEBE2D2, dark: 0x2C2824)
-    static let border2 = Color.clDynamic(light: 0xDDD1BD, dark: 0x3A342D)
-    static let borderStrong = Color.clDynamic(light: 0xC6B8A0, dark: 0x4A4239)
-    static let accent = Color.clDynamic(light: 0xC96442, dark: 0xD9995D)
-    static let accentInk = Color.clDynamic(light: 0x6D351F, dark: 0xF0C48F)
-    static let selected = Color.clDynamic(
-        light: 0xC96442,
-        dark: 0xDC8C64,
-        lightAlpha: 0.12,
-        darkAlpha: 0.16
+    // Backdrops
+    static let desk = Color.clDynamic(light: 0xEDEAE3, dark: 0x000000)
+
+    // Chrome — cool, neutral, slightly translucent-feeling
+    static let window = Color.clDynamic(light: 0xF6F5F1, dark: 0x1C1C1E)
+    static let chrome = Color.clDynamic(light: 0xEFEDE7, dark: 0x232325)
+
+    // Paper / reader surfaces — warm
+    static let paper = Color.clDynamic(light: 0xFBFAF6, dark: 0x1E1D1B)
+    static let surface = Color.clDynamic(light: 0xFFFFFF, dark: 0x2A2A2D)
+    static let surface2 = Color.clDynamic(light: 0xF4F2ED, dark: 0x333336)
+
+    // Ink
+    static let ink = Color.clDynamic(light: 0x1A1A1A, dark: 0xF5F3EE)
+    static let ink2 = Color.clDynamic(light: 0x4A4A4D, dark: 0xC7C5C0)
+    static let ink3 = Color.clDynamic(light: 0x86868B, dark: 0x8E8E93)
+    static let ink4 = Color.clDynamic(light: 0xAEAEAE, dark: 0x636366)
+
+    // Borders — very subtle, rely more on background contrast + shadows
+    static let border = Color.clDynamic(
+        light: 0x000000, dark: 0xFFFFFF,
+        lightAlpha: 0.06, darkAlpha: 0.08
     )
-    static let selectedStrong = Color.clDynamic(
-        light: 0xC96442,
-        dark: 0xDC8C64,
-        lightAlpha: 0.22,
-        darkAlpha: 0.28
+    static let border2 = Color.clDynamic(
+        light: 0x000000, dark: 0xFFFFFF,
+        lightAlpha: 0.10, darkAlpha: 0.12
     )
-    static let hover = Color.clDynamic(
-        light: 0x1F1812,
-        dark: 0xFFF0DC,
-        lightAlpha: 0.05,
-        darkAlpha: 0.05
+    static let borderStrong = Color.clDynamic(
+        light: 0x000000, dark: 0xFFFFFF,
+        lightAlpha: 0.16, darkAlpha: 0.20
     )
+
+    // Accent — terracotta, slightly more vibrant
+    static let accent = Color.clDynamic(light: 0xD4663E, dark: 0xE8915C)
+    static let accentInk = Color.clDynamic(light: 0x9C4221, dark: 0xF4C4A0)
     static let accentSoft = Color.clDynamic(
-        light: 0xC96442,
-        dark: 0xD9995D,
-        lightAlpha: 0.12,
-        darkAlpha: 0.16
+        light: 0xD4663E, dark: 0xE8915C,
+        lightAlpha: 0.10, darkAlpha: 0.14
     )
     static let accentEdge = Color.clDynamic(
-        light: 0xC96442,
-        dark: 0xD9995D,
-        lightAlpha: 0.35,
-        darkAlpha: 0.45
+        light: 0xD4663E, dark: 0xE8915C,
+        lightAlpha: 0.30, darkAlpha: 0.40
     )
+
+    // Selection
+    static let selected = Color.clDynamic(
+        light: 0xD4663E, dark: 0xE8915C,
+        lightAlpha: 0.10, darkAlpha: 0.16
+    )
+    static let selectedStrong = Color.clDynamic(
+        light: 0xD4663E, dark: 0xE8915C,
+        lightAlpha: 0.18, darkAlpha: 0.24
+    )
+
+    // Hover
+    static let hover = Color.clDynamic(
+        light: 0x000000, dark: 0xFFFFFF,
+        lightAlpha: 0.04, darkAlpha: 0.06
+    )
+
+    // Semantic
+    static let success = Color.clDynamic(light: 0x2D9F5E, dark: 0x3FBF7A)
+    static let danger = Color.clDynamic(light: 0xD04040, dark: 0xF06060)
 }
 
+// MARK: - Metrics
+
 enum CLMetric {
-    static let titleBarHeight: CGFloat = 36
-    static let toolbarHeight: CGFloat = 38
-    static let chatHeaderHeight: CGFloat = 38
-    static let leftPaneMinWidth: CGFloat = 220
-    static let leftPaneWidth: CGFloat = 270
+    static let titleBarHeight: CGFloat = 44
+    static let toolbarHeight: CGFloat = 44
+    static let chatHeaderHeight: CGFloat = 44
+    static let leftPaneMinWidth: CGFloat = 240
+    static let leftPaneWidth: CGFloat = 280
     static let leftPaneMaxWidth: CGFloat = 440
-    static let rightPaneMinWidth: CGFloat = 320
-    static let rightPaneWidth: CGFloat = 390
+    static let rightPaneMinWidth: CGFloat = 340
+    static let rightPaneWidth: CGFloat = 400
     static let rightPaneMaxWidth: CGFloat = 680
-    static let rowHeight: CGFloat = 26
+    static let rowHeight: CGFloat = 30
+    static let radius: CGFloat = 10
+    static let radiusSmall: CGFloat = 8
+    static let radiusTiny: CGFloat = 6
 }
+
+// MARK: - Typography
 
 enum CLFont {
     static let titleDoc = Font.system(size: 13, weight: .semibold)
     static let body = Font.system(size: 13)
     static let bodySmall = Font.system(size: 12)
     static let label = Font.system(size: 12, weight: .medium)
+    static let sectionHeader = Font.system(size: 11, weight: .semibold)
     static let meta = Font.system(size: 11, design: .monospaced)
-    static let eyebrow = Font.system(size: 10, weight: .semibold, design: .monospaced)
+    static let eyebrow = Font.system(size: 10, weight: .medium, design: .monospaced)
     static let pdfBody = Font.system(size: 11, design: .serif)
 }
 
+// MARK: - Primitive views
+
 struct CLDivider: View {
-    enum Axis {
-        case horizontal
-        case vertical
-    }
-
+    enum Axis { case horizontal, vertical }
     let axis: Axis
-
-    init(_ axis: Axis) {
-        self.axis = axis
-    }
+    init(_ axis: Axis) { self.axis = axis }
 
     var body: some View {
         Rectangle()
             .fill(CLColor.border)
             .frame(
-                width: axis == .vertical ? 0.5 : nil,
-                height: axis == .horizontal ? 0.5 : nil
+                width: axis == .vertical ? 1 : nil,
+                height: axis == .horizontal ? 1 : nil
             )
     }
 }
@@ -99,21 +127,23 @@ struct CLSectionHeader: View {
 
     var body: some View {
         HStack {
-            Text(title.uppercased())
-                .font(.system(size: 10 * interfaceScale, weight: .semibold, design: .monospaced))
-                .foregroundStyle(CLColor.ink3)
+            Text(title)
+                .font(.system(size: 12 * interfaceScale, weight: .semibold))
+                .foregroundStyle(CLColor.ink2)
             Spacer()
             if let trailing {
-                Text(trailing.uppercased())
-                    .font(.system(size: 10 * interfaceScale, weight: .semibold, design: .monospaced))
+                Text(trailing)
+                    .font(.system(size: 11 * interfaceScale, weight: .medium, design: .monospaced))
                     .foregroundStyle(CLColor.ink4)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 14)
-        .padding(.bottom, 6)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
     }
 }
+
+// MARK: - Toolbar icon button
 
 struct CLToolbarIconButton: View {
     let systemImage: String
@@ -122,26 +152,31 @@ struct CLToolbarIconButton: View {
     var isDisabled = false
     let action: () -> Void
     @Environment(\.clInterfaceScale) private var interfaceScale
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 13 * interfaceScale, weight: .medium))
+                .font(.system(size: 14 * interfaceScale, weight: .medium))
                 .foregroundStyle(isActive ? CLColor.accentInk : CLColor.ink2)
-                .frame(width: 26 * interfaceScale, height: 26 * interfaceScale)
-                .background(isActive ? CLColor.selected : Color.clear)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(isActive ? CLColor.accentEdge : Color.clear, lineWidth: 0.5)
-                }
+                .frame(width: 30 * interfaceScale, height: 30 * interfaceScale)
+                .background(
+                    isActive ? CLColor.accentSoft
+                    : (isHovered ? CLColor.hover : Color.clear)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: CLMetric.radiusTiny))
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
-        .opacity(isDisabled ? 0.45 : 1)
+        .opacity(isDisabled ? 0.35 : 1)
+        .onHover { isHovered = $0 }
         .help(title)
+        .animation(.easeOut(duration: 0.12), value: isHovered)
+        .animation(.easeOut(duration: 0.12), value: isActive)
     }
 }
+
+// MARK: - Context chip
 
 struct CLContextChip: View {
     let systemImage: String
@@ -151,6 +186,7 @@ struct CLContextChip: View {
     var isDisabled = false
     let action: () -> Void
     @Environment(\.clInterfaceScale) private var interfaceScale
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
@@ -158,39 +194,47 @@ struct CLContextChip: View {
                 Image(systemName: systemImage)
                     .font(.system(size: 11 * interfaceScale, weight: .medium))
                 Text(title)
-                    .font(.system(size: 11 * interfaceScale, weight: isActive ? .medium : .regular))
+                    .font(.system(size: 12 * interfaceScale, weight: isActive ? .semibold : .medium))
                 if let meta {
                     Text(meta)
                         .font(.system(size: 10 * interfaceScale, design: .monospaced))
-                        .opacity(0.65)
+                        .foregroundStyle(CLColor.ink4)
                 }
             }
             .lineLimit(1)
             .foregroundStyle(isActive ? CLColor.accentInk : CLColor.ink2)
-            .padding(.horizontal, 8)
-            .frame(height: 22 * interfaceScale)
-            .background(isActive ? CLColor.selected : CLColor.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(isActive ? CLColor.accentEdge : CLColor.border2, lineWidth: 0.5)
-            }
+            .padding(.horizontal, 10)
+            .frame(height: 26 * interfaceScale)
+            .background(
+                isActive ? CLColor.accentSoft
+                : (isHovered ? CLColor.hover : CLColor.surface2)
+            )
+            .clipShape(Capsule())
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
-        .opacity(isDisabled ? 0.45 : 1)
+        .opacity(isDisabled ? 0.4 : 1)
+        .onHover { isHovered = $0 }
+        .animation(.easeOut(duration: 0.12), value: isHovered)
+        .animation(.easeOut(duration: 0.12), value: isActive)
     }
 }
+
+// MARK: - Button styles
 
 struct CLPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 12, weight: .medium))
+            .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 10)
-            .frame(height: 26)
-            .background(CLColor.accent.opacity(configuration.isPressed ? 0.82 : 1))
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .padding(.horizontal, 14)
+            .frame(height: 28)
+            .background(
+                RoundedRectangle(cornerRadius: CLMetric.radiusTiny)
+                    .fill(CLColor.accent)
+                    .opacity(configuration.isPressed ? 0.80 : 1)
+            )
+            .shadow(color: CLColor.accent.opacity(0.25), radius: 3, y: 1)
     }
 }
 
@@ -199,27 +243,32 @@ struct CLGhostButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(CLColor.ink2)
-            .padding(.horizontal, 10)
-            .frame(height: 26)
-            .background(configuration.isPressed ? CLColor.hover : CLColor.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(CLColor.border2, lineWidth: 0.5)
-            }
+            .padding(.horizontal, 14)
+            .frame(height: 28)
+            .background(
+                RoundedRectangle(cornerRadius: CLMetric.radiusTiny)
+                    .fill(configuration.isPressed ? CLColor.hover : CLColor.surface2)
+            )
     }
 }
 
+// MARK: - Card modifier
+
 extension View {
-    func clCard(cornerRadius: CGFloat = 8) -> some View {
-        background(CLColor.surface)
+    func clCard(cornerRadius: CGFloat = CLMetric.radiusSmall) -> some View {
+        self
+            .background(CLColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(CLColor.border2, lineWidth: 0.5)
-            }
+            .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
+    }
+
+    /// Material-backed elevated surface for toolbars, headers, and floating panels.
+    func clMaterialBar() -> some View {
+        self.background(.regularMaterial)
     }
 }
+
+// MARK: - Color helpers
 
 extension Color {
     static func clDynamic(

@@ -23,7 +23,7 @@ struct DocumentSidebar: View {
             .scrollIndicators(.hidden)
             DisplaySettingsPanel()
         }
-        .background(CLColor.window)
+        .background(CLColor.chrome)
         .onChange(of: viewModel.searchFieldFocusToken) { _, _ in
             isSearchFocused = true
         }
@@ -83,14 +83,10 @@ struct DocumentSidebar: View {
         }
         .padding(.horizontal, 8)
         .frame(height: 26 * interfaceScale)
-        .background(CLColor.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
-        .overlay {
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(CLColor.border2, lineWidth: 0.5)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .background(CLColor.surface2)
+        .clipShape(Capsule())
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
 
     private var searchText: Binding<String> {
